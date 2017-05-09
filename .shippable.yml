@@ -11,8 +11,9 @@ env:
         - ZEPHYR_GCC_VARIANT=zephyr
         - USE_CCACHE=1
     matrix:
-        - ARCH="-a x86 -a riscv32" RUN_COMPLIANCE="1"
-        - ARCH="-a arm -a arc -a nios2"
+        - ARCH="-a x86"
+        - ARCH="-a arm"
+        - ARCH="-a arc -a nios2 -a riscv32"
 
 build:
     cache: true
@@ -32,31 +33,13 @@ build:
       - make host-tools
       - export PREBUILT_HOST_TOOLS=${ZEPHYR_BASE}/bin
       - >
-          if [ "$IS_PULL_REQUEST" = "true" ]; then
-            S3_PATH="s3://zephyr-logs/pull-requests/${REPO_FULL_NAME}/${PULL_REQUEST}"
+          if [ "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
+            LOG_TYPE="manual";
           else
-            if [ "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
-              LOG_TYPE="manual";
-            else
-              LOG_TYPE=${JOB_TRIGGERED_BY_NAME};
-            fi;
+            LOG_TYPE=${JOB_TRIGGERED_BY_NAME};
+          fi;
 
-            S3_PATH="s3://zephyr-logs/${LOG_TYPE}/${REPO_FULL_NAME}/${BUILD_NUMBER}";
-          fi;
-      - >
-          if [ "$RUN_COMPLIANCE" = "1" -a "$IS_PULL_REQUEST" = "true" ]; then
-            export COMMIT_RANGE=origin/${PULL_REQUEST_BASE_BRANCH}..${COMMIT}
-            echo "Building a Pull Request";
-            echo "- Building Documentation";
-            echo "Commit range:" ${COMMIT_RANGE}
-            make htmldocs > doc.log 2>&1;
-            ./scripts/filter-known-issues.py --config-dir .known-issues/doc/ doc.log > doc.warnings;
-            if [ -s doc.warnings ]; then
-              echo " => New documentation warnings/errors";
-            fi;
-            echo "- Verify commit message and coding style";
-            ./scripts/ci/check-compliance.py || true;
-          fi;
+          S3_PATH="s3://zephyr-logs/${LOG_TYPE}/${REPO_FULL_NAME}/${BUILD_NUMBER}";
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-asserts" ]; then
             echo "- Building with --all --enable-slow -R";
