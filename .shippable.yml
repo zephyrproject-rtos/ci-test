@@ -28,6 +28,7 @@ build:
       - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/.ccache
       - source zephyr-env.sh
       - ccache -s --max-size=2000M
+      - cd zephyr
       - make host-tools
       - export PREBUILT_HOST_TOOLS=${ZEPHYR_BASE}/bin
       - >
