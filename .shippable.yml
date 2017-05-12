@@ -27,6 +27,7 @@ build:
 
     ci:
       - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/.ccache
+      - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
       - ccache -s --max-size=2000M
