@@ -10,15 +10,8 @@ env:
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.1
         - ZEPHYR_GCC_VARIANT=zephyr
         - USE_CCACHE=1
-        - COVERAGE="--all --enable-slow"
-        - MATRIX_BUILDS="6"
     matrix:
         - MATRIX_BUILD="1"
-        - MATRIX_BUILD="2"
-        - MATRIX_BUILD="3"
-        - MATRIX_BUILD="4"
-        - MATRIX_BUILD="5"
-        - MATRIX_BUILD="6"
 
 build:
     cache: true
@@ -35,53 +28,10 @@ build:
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
-      - ccache -c -s --max-size=2000M
-      - make host-tools
-      - export PREBUILT_HOST_TOOLS=${ZEPHYR_BASE}/bin
-      - >
-          if [ "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
-            LOG_TYPE="manual";
-          else
-            LOG_TYPE=${JOB_TRIGGERED_BY_NAME};
-          fi;
-
-          S3_PATH="s3://zephyr-logs/${LOG_TYPE}/${REPO_FULL_NAME}/${BUILD_NUMBER}";
-      - >
-          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" ]; then
-            echo "- Building with --all --enable-slow";
-            COVERAGE="--all --enable-slow";
-          fi;
-      - >
-          if [ "$JOB_TRIGGERED_BY_NAME" != "code-scan" ]; then
-            ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS} || ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
-          fi
-      - ccache -s
+      - git clone https://github.com/zephyrproject-rtos/docs-theme.git doc/themes/zephyr-docs-theme
+      - make DOC_TAG=daily htmldocs
     on_success:
-      - rm -rf sanity-out out-2nd-pass
-      - mkdir -p ../shippable/testresults
-      - >
-          if [ -e compliance.xml ]; then
-            cp compliance.xml ../shippable/testresults/;
-            aws s3 cp compliance.xml ${S3_PATH}/;
-          fi;
-      - >
-          if [ -e ./scripts/sanity_chk/last_sanity.xml ]; then
-            cp ./scripts/sanity_chk/last_sanity.xml ../shippable/testresults/;
-            aws s3 cp ./scripts/sanity_chk/last_sanity.xml ${S3_PATH}/sanitycheck.xml;
-          fi;
-    on_failure:
-      - rm -rf sanity-out out-2nd-pass
-      - mkdir -p ../shippable/testresults
-      - >
-          if [ -e compliance.xml ]; then
-            cp compliance.xml ../shippable/testresults/;
-            aws s3 cp compliance.xml ${S3_PATH}/;
-          fi;
-      - >
-          if [ -e ./scripts/sanity_chk/last_sanity.xml ]; then
-            cp ./scripts/sanity_chk/last_sanity.xml ../shippable/testresults/;
-            aws s3 cp ./scripts/sanity_chk/last_sanity.xml ${S3_PATH}/sanitycheck.xml;
-          fi;
+      - aws s3 sync --quiet --delete doc/_build/html s3://zephyr-docs/online/dev
 
 integrations:
   notifications:
@@ -101,8 +51,5 @@ integrations:
       branches:
         only:
           - master
-          - net
-          - bluetooth
-          - arm
       on_success: never
       on_failure: never
