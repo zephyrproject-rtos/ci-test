@@ -26,6 +26,8 @@ build:
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
+      - sphinx-build --version
+      - pip show docutils sphinx breathe sphinx_rtd_theme junit2html
       - git clone https://github.com/zephyrproject-rtos/docs-theme.git doc/themes/zephyr-docs-theme
       - make DOC_TAG=daily htmldocs
     on_success:
