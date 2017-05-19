@@ -4,10 +4,8 @@ compiler: gcc
 
 env:
     global:
-        - SDK=0.9.1
-        - SANITYCHECK_OPTIONS=" --inline-logs -R"
-        - SANITYCHECK_OPTIONS_RETRY=" --inline-logs --only-failed --outdir=out-2nd-pass"
-        - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.1
+        - SDK=0.9
+        - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9
         - ZEPHYR_GCC_VARIANT=zephyr
         - USE_CCACHE=1
     matrix:
@@ -18,8 +16,8 @@ build:
     cache_dir_list:
         - ${SHIPPABLE_BUILD_DIR}/ccache
     pre_ci_boot:
-        image_name: zephyrprojectrtos/ci
-        image_tag: master.15
+        image_name: nashif/zephyr
+        image_tag: master.6
         pull: true
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
