@@ -12,6 +12,8 @@ env:
         - USE_CCACHE=1
         - COVERAGE="--all --enable-slow"
         - MATRIX_BUILDS="6"
+        - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
+        - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
     matrix:
         - MATRIX_BUILD="1"
         - MATRIX_BUILD="2"
