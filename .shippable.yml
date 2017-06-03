@@ -26,7 +26,7 @@ build:
         - ${SHIPPABLE_BUILD_DIR}/ccache
     pre_ci_boot:
         image_name: zephyrprojectrtos/ci
-        image_tag: master.16
+        image_tag: master.21
         pull: true
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
@@ -53,7 +53,7 @@ build:
           fi;
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-issm" ]; then
             echo "- Building with ISSM";
-            export ISSM_INSTALLATION_PATH=/opt/issm
+            export ISSM_INSTALLATION_PATH=/opt/toolchain/issm
             export ZEPHYR_GCC_VARIANT=issm
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
             echo "- Building with ARM cross toolchain";
