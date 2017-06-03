@@ -100,12 +100,9 @@ integrations:
     - integrationName: email
       type: email
       recipients:
-        - builds@zephyrproject.org
+        - zephyr-builds@lists.zephyrproject.org
       branches:
         only:
           - master
-          - net
-          - bluetooth
-          - arm
       on_success: never
-      on_failure: never
+      on_failure: always
