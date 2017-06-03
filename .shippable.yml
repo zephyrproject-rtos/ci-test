@@ -51,11 +51,24 @@ build:
             echo "- Building with -R --all --enable-slow";
             COVERAGE="--all --enable-slow";
           fi;
+          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-issm" ]; then
+            echo "- Building with ISSM";
+            export ISSM_INSTALLATION_PATH=/opt/issm
+            export ZEPHYR_GCC_VARIANT=issm
+          elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
+            echo "- Building with ARM cross toolchain";
+            export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
+            export ZEPHYR_GCC_VARIANT=gccarmemb
+          fi;
       - >
         ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
         if [ "$?" != "0" ]; then
           sleep 10;
-          ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
+          ./scripts/sanitycheck ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
+          if [ "$?" != "0" ]; then
+            sleep 10;
+            ./scripts/sanitycheck ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
+          fi;
         fi;
       - ccache -s
     post_ci:
