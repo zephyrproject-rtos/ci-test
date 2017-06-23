@@ -22,12 +22,15 @@ while getopts "dr:" opt; do
 	esac
 done
 
-cd ${MAIN_REPO_STATE}
+if [ -n "$MAIN_REPO_STATE" ]; then
+	cd ${MAIN_REPO_STATE}
+fi
 
 if [ "$TYPE" == "release" ]; then
 	git checkout v${RELEASE}-branch
 fi
-source zephyr-env.sh
+pwd
+source ./zephyr-env.sh
 unset BUILDDIR
 
 if [ -d /build/IN/docs_theme_repo/gitRepo -a ! -e doc/themes/zephyr-docs-theme ]; then
