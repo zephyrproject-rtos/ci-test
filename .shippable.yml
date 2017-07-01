@@ -62,7 +62,7 @@ build:
             export ISSM_INSTALLATION_PATH=/opt/toolchain/issm
             export ZEPHYR_GCC_VARIANT=issm
           elif [ "$JOB_TRIGGERED_BY_NAME" = "code-scan" ]; then
-            wget https://scan.coverity.com/download/linux64 --post-data "token=${COVERITY_TOKEN}&project=Zephyr" -O coverity_tool.tgz
+            wget -q https://scan.coverity.com/download/linux64 --post-data "token=${COVERITY_TOKEN}&project=Zephyr" -O coverity_tool.tgz
             tar xvf coverity_tool.tgz;
             rm -f coverity_tool.tgz;
             mv cov-*  cov-analysis;
@@ -74,7 +74,9 @@ build:
 
             export COVERAGE="-a arc -a arm -a x86"
             cov-build --dir ${SHIPPABLE_BUILD_DIR}/cov-build/cov-int ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
-            aws s3 sync --quiet  ${SHIPPABLE_BUILD_DIR}/cov-build/cov-int  s3://coverity.zephyrproject.org/
+
+            GIT_VERSION=$(git describe)
+            aws s3 sync --quiet  ${SHIPPABLE_BUILD_DIR}/cov-build/cov-int  s3://coverity.zephyrproject.org/weekly/
 
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
             echo "- Building with ARM cross toolchain";
@@ -126,4 +128,4 @@ integrations:
         only:
           - master
       on_success: never
-      on_failure: always
+      on_failure: never
