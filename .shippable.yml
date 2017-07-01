@@ -61,17 +61,34 @@ build:
             echo "- Building with ISSM";
             export ISSM_INSTALLATION_PATH=/opt/toolchain/issm
             export ZEPHYR_GCC_VARIANT=issm
+          elif [ "$JOB_TRIGGERED_BY_NAME" = "code-scan" ]; then
+            wget https://scan.coverity.com/download/linux64 --post-data "token=${COVERITY_TOKEN}&project=Zephyr" -O coverity_tool.tgz
+            tar xvf coverity_tool.tgz;
+            rm -f coverity_tool.tgz;
+            mv cov-*  cov-analysis;
+            export PATH=$PATH:${PWD}/cov-analysis/bin
+
+            cov-configure --comptype gcc --compiler i586-zephyr-elfiamcu-gcc --template
+            cov-configure --comptype gcc --compiler arm-zephyr-eabi-gcc --template
+            cov-configure --comptype gcc --compiler arc-zephyr-elf-gcc --template
+
+            export COVERAGE="-a arc -a arm -a x86"
+            cov-build --dir ${SHIPPABLE_BUILD_DIR}/cov-build/cov-int ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+            aws s3 sync --quiet  ${SHIPPABLE_BUILD_DIR}/cov-build/cov-int  s3://coverity.zephyrproject.org/
+
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
             echo "- Building with ARM cross toolchain";
             export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
             export ZEPHYR_GCC_VARIANT=gccarmemb
           fi;
       - >
-        ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
-        if [ "$?" != "0" ]; then
-          sleep 10;
-          ./scripts/sanitycheck ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
-        fi;
+        if [ "$JOB_TRIGGERED_BY_NAME" != "code-scan" ]; then
+          ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+          if [ "$?" != "0" ]; then
+            sleep 10;
+            ./scripts/sanitycheck ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
+          fi;
+        fi
       - ccache -s
     on_success:
       - rm -rf sanity-out out-2nd-pass
