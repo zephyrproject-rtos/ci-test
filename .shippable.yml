@@ -11,10 +11,10 @@ env:
         - ZEPHYR_GCC_VARIANT=zephyr
         - USE_CCACHE=1
         - COVERAGE="--all --enable-slow"
-        - MATRIX_BUILDS="6"
         - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
         - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
         - DTC=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/dtc
+        - MATRIX_BUILDS="8"
     matrix:
         - MATRIX_BUILD="1"
         - MATRIX_BUILD="2"
@@ -22,6 +22,8 @@ env:
         - MATRIX_BUILD="4"
         - MATRIX_BUILD="5"
         - MATRIX_BUILD="6"
+        - MATRIX_BUILD="7"
+        - MATRIX_BUILD="8"
 
 build:
     cache: true
