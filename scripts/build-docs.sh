@@ -2,14 +2,14 @@
 #set -ex
 
 TYPE=daily
-RELEASE=dev
+RELEASE=
 
 while getopts "dr:" opt; do
 	case $opt in
 		d)
 			echo "Building daily docs" >&2
 			TYPE=daily
-			RELEASE=dev
+			RELEASE=
 			;;
 		r)
 			echo "Building release docs" >&2
@@ -44,6 +44,6 @@ make DOC_TAG=${TYPE} htmldocs > doc.log 2>&1
 
 echo "- Uploading to AWS S3..."
 #aws s3 sync --quiet --delete doc/_build/html s3://docs.zephyrproject.org/online/${RELEASE}
-aws s3 sync --quiet --delete doc/_build/html s3://zephyr-docs/online/${RELEASE}
+aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
 
 echo "=> Done"
