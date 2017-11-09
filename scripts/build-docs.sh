@@ -39,8 +39,9 @@ elif [ ! -e doc/themes/zephyr-docs-theme ]; then
 	git clone https://github.com/zephyrproject-rtos/docs-theme.git doc/themes/zephyr-docs-theme
 fi
 
-echo "- Building docs for ${RELEASE} ..."
-make DOC_TAG=${TYPE} htmldocs > doc.log 2>&1
+echo "- Building docs for ${RELEASE:-development tree} ..."
+ls -la
+make DOC_TAG=${TYPE} htmldocs
 
 echo "- Uploading to AWS S3..."
 #aws s3 sync --quiet --delete doc/_build/html s3://docs.zephyrproject.org/online/${RELEASE}
