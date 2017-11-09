@@ -31,7 +31,7 @@ build:
         - ${SHIPPABLE_BUILD_DIR}/ccache
     pre_ci_boot:
         image_name: zephyrprojectrtos/ci
-        image_tag: master.43
+        image_tag: v0.2
         pull: true
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
@@ -41,8 +41,6 @@ build:
       - cd zephyr
       - source zephyr-env.sh
       - ccache -c -s --max-size=5000M
-      - make host-tools
-      - export PREBUILT_HOST_TOOLS=${ZEPHYR_BASE}/bin
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             LOG_TYPE="manual";
