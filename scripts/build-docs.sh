@@ -39,7 +39,9 @@ elif [ ! -e doc/themes/zephyr-docs-theme ]; then
 fi
 
 echo "- Building docs for ${RELEASE:-development tree} ..."
+
 ls -la doc/extensions/zephyr/application.py
+
 make -C doc DOC_TAG=${TYPE} htmldocs
 if [ "$?" == "0" ]; then
 	echo "- Uploading to AWS S3..."
