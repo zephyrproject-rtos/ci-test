@@ -40,12 +40,10 @@ fi
 
 echo "- Building docs for ${RELEASE:-development tree} ..."
 
-ls -la doc/extensions/zephyr/application.py
-
 make -C doc DOC_TAG=${TYPE} htmldocs
 if [ "$?" == "0" ]; then
 	echo "- Uploading to AWS S3..."
-	#aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
+	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
 else
 	echo "- Failed"
 fi
