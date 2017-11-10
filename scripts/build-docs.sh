@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -ex
 
 TYPE=daily
 RELEASE=
@@ -40,11 +39,13 @@ elif [ ! -e doc/themes/zephyr-docs-theme ]; then
 fi
 
 echo "- Building docs for ${RELEASE:-development tree} ..."
-ls -la
+ls -la doc/extensions/zephyr/application.py
 make -C doc DOC_TAG=${TYPE} htmldocs
-
-echo "- Uploading to AWS S3..."
-#aws s3 sync --quiet --delete doc/_build/html s3://docs.zephyrproject.org/online/${RELEASE}
-aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
+if [ "$?" == "0" ]; then
+	echo "- Uploading to AWS S3..."
+	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
+else
+	echo "- Failed"
+fi
 
 echo "=> Done"
