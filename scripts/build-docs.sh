@@ -1,14 +1,14 @@
 #!/bin/bash
 
 TYPE=daily
-RELEASE=
+RELEASE=latest
 
 while getopts "dr:" opt; do
 	case $opt in
 		d)
 			echo "Building daily docs" >&2
 			TYPE=daily
-			RELEASE=
+			RELEASE=latest
 			;;
 		r)
 			echo "Building release docs" >&2
@@ -43,7 +43,13 @@ echo "- Building docs for ${RELEASE:-development tree} ..."
 make -C doc DOC_TAG=${TYPE} htmldocs
 if [ "$?" == "0" ]; then
 	echo "- Uploading to AWS S3..."
-	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${RELEASE}
+	if [ "$RELEASE" == "latest" ]; then
+		DOC_RELEASE=
+	else
+		DOC_RELEASE=${RELEASE}
+	fi
+	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
+	aws s3 sync --delete  --quiet doc/doxygen/html s3://docs.zephyrproject.org/apidoc/${RELEASE}
 else
 	echo "- Failed"
 fi
