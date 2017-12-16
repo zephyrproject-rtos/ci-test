@@ -2,6 +2,7 @@
 
 TYPE=daily
 RELEASE=latest
+TMP_BRANCH=$(mktemp XXXXXXXXX)
 
 while getopts "dr:" opt; do
 	case $opt in
@@ -26,7 +27,8 @@ if [ -n "$MAIN_REPO_STATE" ]; then
 fi
 
 if [ "$TYPE" == "release" ]; then
-	git checkout v${RELEASE}-branch
+	git checkout upstream/v${RELEASE}-branch -b v${RELEASE}-branch-local.${TMP_BRANCH}
+	git clean -dxf
 fi
 pwd
 source ./zephyr-env.sh
@@ -46,10 +48,12 @@ if [ "$?" == "0" ]; then
 	if [ "$RELEASE" == "latest" ]; then
 		DOC_RELEASE=
 	else
-		DOC_RELEASE=${RELEASE}
+		DOC_RELEASE=${RELEASE}.0
 	fi
 	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
-	aws s3 sync --delete  --quiet doc/doxygen/html s3://docs.zephyrproject.org/apidoc/${RELEASE}
+	if [ -d doc/doxygen/html ]; then
+		aws s3 sync --delete  --quiet doc/doxygen/html s3://docs.zephyrproject.org/apidoc/${RELEASE}
+	fi
 else
 	echo "- Failed"
 fi
