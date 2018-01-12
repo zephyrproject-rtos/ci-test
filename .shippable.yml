@@ -6,7 +6,7 @@ env:
     global:
         - SDK=0.9.2
         - SANITYCHECK_OPTIONS=" --inline-logs -R -N"
-        - SANITYCHECK_OPTIONS_RETRY=" --inline-logs --only-failed --outdir=out-2nd-pass"
+        - SANITYCHECK_OPTIONS_RETRY=" --only-failed --outdir=out-2nd-pass"
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.2
         - ZEPHYR_GCC_VARIANT=zephyr
         - USE_CCACHE=1
@@ -71,7 +71,7 @@ build:
         ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
         if [ "$?" != "0" ]; then
           sleep 10;
-          ./scripts/sanitycheck ${COVERAGE} ${SANITYCHECK_OPTIONS_RETRY};
+          ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
         fi;
       - ccache -s
     on_success:
