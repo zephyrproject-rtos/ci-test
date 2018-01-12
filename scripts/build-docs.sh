@@ -42,7 +42,7 @@ fi
 
 echo "- Building docs for ${RELEASE:-development tree} ..."
 
-make -C doc DOC_TAG=${TYPE} htmldocs
+make -C doc DOC_TAG=${TYPE} htmldocs || true
 if [ "$?" == "0" ]; then
 	echo "- Uploading to AWS S3..."
 	if [ "$RELEASE" == "latest" ]; then
