@@ -42,7 +42,9 @@ fi
 
 echo "- Building docs for ${RELEASE:-development tree} ..."
 
-make -C doc DOC_TAG=${TYPE} htmldocs || true
+export ENV_VAR_BOARD_DIR=boards/*/*/
+export ENV_VAR_ARCH=*
+make DOC_TAG=${TYPE} htmldocs
 if [ "$?" == "0" ]; then
 	echo "- Uploading to AWS S3..."
 	if [ "$RELEASE" == "latest" ]; then
@@ -50,7 +52,7 @@ if [ "$?" == "0" ]; then
 	else
 		DOC_RELEASE=${RELEASE}.0
 	fi
-	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
+	aws s3 sync doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
 	if [ -d doc/doxygen/html ]; then
 		aws s3 sync --delete  --quiet doc/doxygen/html s3://docs.zephyrproject.org/apidoc/${RELEASE}
 	fi
