@@ -43,15 +43,7 @@ build:
       - source zephyr-env.sh
       - ccache -c -s --max-size=5000M
       - >
-          if [ "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
-            LOG_TYPE="manual";
-          else
-            LOG_TYPE=${JOB_TRIGGERED_BY_NAME};
-          fi;
-
-          S3_PATH="s3://zephyr-logs/${LOG_TYPE}/${REPO_FULL_NAME}/${BUILD_NUMBER}";
-      - >
-          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" ]; then
+          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             echo "- Building with -R --all --enable-slow";
             COVERAGE="--all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-debug" ]; then
