@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 TYPE=daily
 RELEASE=latest
@@ -52,9 +53,10 @@ if [ "$?" == "0" ]; then
 	else
 		DOC_RELEASE=${RELEASE}.0
 	fi
-	aws s3 sync doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
+	aws s3 sync --quiet doc/_build/html s3://docs.zephyrproject.org/${DOC_RELEASE}
 	if [ -d doc/doxygen/html ]; then
 		aws s3 sync --delete  --quiet doc/doxygen/html s3://docs.zephyrproject.org/apidoc/${RELEASE}
+
 	fi
 else
 	echo "- Failed"
