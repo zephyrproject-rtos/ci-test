@@ -8,7 +8,6 @@ env:
         - SANITYCHECK_OPTIONS=" --inline-logs -R -N"
         - SANITYCHECK_OPTIONS_RETRY=" --only-failed --outdir=out-2nd-pass"
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.2
-        - ZEPHYR_GCC_VARIANT=zephyr
         - ZEPHYR_TOOLCHAIN_VARIANT=zephyr
         - USE_CCACHE=1
         - COVERAGE="--all --enable-slow"
@@ -54,14 +53,18 @@ build:
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-issm" ]; then
             echo "- Building with ISSM";
             export ISSM_INSTALLATION_PATH=/opt/toolchain/issm
-            export ZEPHYR_GCC_VARIANT=issm
+            export ZEPHYR_TOOLCHAIN_VARIANT=issm
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
             echo "- Building with ARM cross toolchain";
             export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
-            export ZEPHYR_GCC_VARIANT=gccarmemb
+            export ZEPHYR_TOOLCHAIN_VARIANT=gccarmemb
           fi;
       - >
         ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+        if [ "$?" != "0" ]; then
+          sleep 10;
+          ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
+        fi;
         if [ "$?" != "0" ]; then
           sleep 10;
           ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
