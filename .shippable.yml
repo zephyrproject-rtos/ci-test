@@ -102,7 +102,7 @@ integrations:
     - integrationName: email
       type: email
       recipients:
-        - zephyr-builds@lists.zephyrproject.org
+        - builds@lists.zephyrproject.org
       branches:
         only:
           - master
