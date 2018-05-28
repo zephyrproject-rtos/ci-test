@@ -35,16 +35,16 @@ build:
         - ${SHIPPABLE_BUILD_DIR}/ccache
     pre_ci_boot:
         image_name: zephyrprojectrtos/ci
-        image_tag: v0.4-rc4
+        image_tag: v0.4-rc5
         pull: true
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
     ci:
-      - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/.ccache
+      - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/${MATRIX_BUILD}/.ccache
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
-      - ccache -c -s --max-size=5000M
+      - ccache -c -s --max-size=1800M
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             echo "- Building with -R --all --enable-slow";
