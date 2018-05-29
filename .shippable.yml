@@ -40,11 +40,11 @@ build:
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
     ci:
-      - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/${MATRIX_BUILD}/.ccache
+      - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/.ccache
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
-      - ccache -c -s --max-size=1800M
+      - ccache -c -s --max-size=10000M
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             echo "- Building with --all --enable-slow";
