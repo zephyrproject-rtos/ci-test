@@ -5,12 +5,12 @@ compiler: gcc
 env:
     global:
         - SDK=0.9.3
-        - SANITYCHECK_OPTIONS=" --inline-logs"
+        - SANITYCHECK_OPTIONS=" --inline-logs -N"
         - SANITYCHECK_OPTIONS_RETRY=" --only-failed --outdir=out-2nd-pass"
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.3
         - ZEPHYR_TOOLCHAIN_VARIANT=zephyr
         - USE_CCACHE=1
-        - COVERAGE="--all --enable-slow"
+        - COVERAGE="--all "
         - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
         - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
         - DTC=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/dtc
@@ -47,12 +47,10 @@ build:
       - ccache -c -s --max-size=1800M
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
-            echo "- Building with -R --all --enable-slow";
-            COVERAGE="--all --enable-slow";
+            echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-debug" ]; then
             export CONFIG_DEBUG=y
-            echo "- Building with -R --all --enable-slow";
-            COVERAGE="--all --enable-slow";
+            echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-issm" ]; then
             echo "- Building with ISSM";
             export ISSM_INSTALLATION_PATH=/opt/toolchain/issm
@@ -74,14 +72,12 @@ build:
         fi;
       - ccache -s
     on_success:
-      - rm -rf sanity-out out-2nd-pass
       - mkdir -p ../shippable/testresults
       - >
         if [ -e ./scripts/sanity_chk/last_sanity.xml ]; then
           cp ./scripts/sanity_chk/last_sanity.xml ../shippable/testresults/;
         fi;
     on_failure:
-      - rm -rf sanity-out out-2nd-pass
       - mkdir -p ../shippable/testresults
       - >
         if [ -e ./scripts/sanity_chk/last_sanity.xml ]; then
