@@ -44,7 +44,7 @@ build:
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
-      - ccache -c -s --max-size=10000M
+      - ccache -c -s --max-size=5000M
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             echo "- Building with --all --enable-slow";
