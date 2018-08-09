@@ -61,7 +61,7 @@ build:
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
             echo "- Building with ARM cross toolchain";
             export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
-            export ZEPHYR_TOOLCHAIN_VARIANT=gccarmemb
+            export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
           fi;
       - >
         ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
