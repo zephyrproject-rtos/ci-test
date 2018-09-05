@@ -14,7 +14,7 @@ env:
         - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
         - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
         - DTC=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/dtc
-        - MATRIX_BUILDS="15"
+        - MATRIX_BUILDS="20"
     matrix:
         - MATRIX_BUILD="1"
         - MATRIX_BUILD="2"
@@ -31,6 +31,11 @@ env:
         - MATRIX_BUILD="13"
         - MATRIX_BUILD="14"
         - MATRIX_BUILD="15"
+        - MATRIX_BUILD="16"
+        - MATRIX_BUILD="17"
+        - MATRIX_BUILD="18"
+        - MATRIX_BUILD="19"
+        - MATRIX_BUILD="20"
 
 build:
     cache: true
