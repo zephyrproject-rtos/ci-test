@@ -13,7 +13,7 @@ env:
         - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
         - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
         - DTC=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/dtc
-        - MATRIX_BUILDS="25"
+        - MATRIX_BUILDS="20"
     matrix:
         - MATRIX_BUILD="1"
         - MATRIX_BUILD="2"
@@ -35,11 +35,6 @@ env:
         - MATRIX_BUILD="18"
         - MATRIX_BUILD="19"
         - MATRIX_BUILD="20"
-        - MATRIX_BUILD="21"
-        - MATRIX_BUILD="22"
-        - MATRIX_BUILD="23"
-        - MATRIX_BUILD="24"
-        - MATRIX_BUILD="25"
 
 build:
     cache: true
@@ -54,28 +49,24 @@ build:
     ci:
       - git submodule update --remote
       - cd zephyr
+      - cp $CI_TEST_PREP_STATE/tests.csv.gz .
+      - gzip -d tests.csv.gz
       - source zephyr-env.sh
       - >
           if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-1" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
             echo "- Building with --all --enable-slow";
-            export MATRIX_BUILDS=50
-            export MATRIX_OFFSET=0
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-2" ]; then
-            export MATRIX_BUILDS=50
-            export MATRIX_OFFSET=25
             echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-debug" ]; then
             export CONFIG_DEBUG=y
             echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
-            export MATRIX_OFFSET=0
             echo "- Building with ARM cross toolchain";
             export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
             export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
           fi;
       - >
-        export MATRIX_BUILD_OFF=$((MATRIX_OFFSET + MATRIX_BUILD));
-        ./scripts/sanitycheck --subset ${MATRIX_BUILD_OFF}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+        ./scripts/sanitycheck --load-tests tests.csv --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
         if [ "$?" != "0" ]; then
           sleep 20;
           ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
