@@ -9,7 +9,6 @@ env:
         - SANITYCHECK_OPTIONS_RETRY=" --only-failed --outdir=out-2nd-pass"
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.9.5
         - ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-        - USE_CCACHE=1
         - COVERAGE="--all "
         - QEMU_BIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/
         - QEMU_BIOS=${ZEPHYR_SDK_INSTALL_DIR}/sysroots/x86_64-pokysdk-linux/usr/share/qemu
@@ -53,30 +52,36 @@ build:
         options: "-e HOME=/home/buildslave --privileged=true --tty --net=bridge --user buildslave"
 
     ci:
-      - export CCACHE_DIR=${SHIPPABLE_BUILD_DIR}/ccache/.ccache
       - git submodule update --remote
       - cd zephyr
       - source zephyr-env.sh
-      - ccache -c -s --max-size=5000M
       - >
-          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
+          if [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-1" -o "$JOB_TRIGGERED_BY_NAME" = "undefined" ]; then
+            echo "- Building with --all --enable-slow";
+            export MATRIX_BUILDS=50
+            export MATRIX_OFFSET=0
+          elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-2" ]; then
+            export MATRIX_BUILDS=50
+            export MATRIX_OFFSET=25
             echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-debug" ]; then
             export CONFIG_DEBUG=y
             echo "- Building with --all --enable-slow";
           elif [ "$JOB_TRIGGERED_BY_NAME" = "daily-verify-arm" ]; then
+            export MATRIX_OFFSET=0
             echo "- Building with ARM cross toolchain";
             export GCCARMEMB_TOOLCHAIN_PATH=/opt/toolchain/arm-none-eabi
             export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
           fi;
       - >
-        ./scripts/sanitycheck --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+        export MATRIX_BUILD_OFF=$((MATRIX_OFFSET + MATRIX_BUILD));
+        ./scripts/sanitycheck --subset ${MATRIX_BUILD_OFF}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
         if [ "$?" != "0" ]; then
-          sleep 10;
+          sleep 20;
           ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
         fi;
         if [ "$?" != "0" ]; then
-          sleep 10;
+          sleep 20;
           ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
         fi;
       - ccache -s
