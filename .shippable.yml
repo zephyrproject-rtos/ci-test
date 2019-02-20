@@ -52,6 +52,7 @@ build:
       - cp $CI_TEST_PREP_STATE/tests.csv.gz .
       - cp $CI_TEST_PREP_STATE/zephyrrc .
       - source zephyrrc
+      - cat zephyrrc
       - gzip -d tests.csv.gz
       - source zephyr-env.sh
       - >
