@@ -4,7 +4,6 @@ compiler: gcc
 
 env:
     global:
-        - SDK=0.9.5
         - SANITYCHECK_OPTIONS=" --inline-logs -N"
         - SANITYCHECK_OPTIONS_RETRY=" --only-failed --outdir=out-2nd-pass"
         - COVERAGE="--all "
