@@ -42,8 +42,9 @@ build:
 
     ci:
       - git submodule update --remote
-      - cd zephyr
+      - west init -l zephyr
       - west update
+      - cd zephyr
       - cp $CI_TEST_PREP_STATE/tests.csv.gz .
       - cp $CI_TEST_PREP_STATE/zephyrrc .
       - source zephyrrc
