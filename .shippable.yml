@@ -55,7 +55,7 @@ build:
       - gzip -d tests.csv.gz
       - source zephyr-env.sh
       - >
-        ./scripts/sanitycheck --load-tests tests.csv --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
+        ./scripts/sanitycheck --build-only --load-tests tests.csv --subset ${MATRIX_BUILD}/${MATRIX_BUILDS} ${COVERAGE} ${SANITYCHECK_OPTIONS};
         if [ "$?" != "0" ]; then
           sleep 20;
           ./scripts/sanitycheck ${SANITYCHECK_OPTIONS} ${SANITYCHECK_OPTIONS_RETRY} || true;
