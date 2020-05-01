@@ -5,7 +5,7 @@ compiler: gcc
 env:
     global:
         - SANITYCHECK_OPTIONS=" --inline-logs -N --build-only --all --retry-failed 3 -v "
-        - MATRIX_BUILDS="30"
+        - MATRIX_BUILDS="35"
         - ZEPHYR_TOOLCHAIN_VARIANT="zephyr"
         - ZEPHYR_SDK_INSTALL_DIR=/opt/sdk/zephyr-sdk-0.11.2
     matrix:
@@ -39,6 +39,11 @@ env:
         - MATRIX_BUILD="28"
         - MATRIX_BUILD="29"
         - MATRIX_BUILD="30"
+        - MATRIX_BUILD="31"
+        - MATRIX_BUILD="32"
+        - MATRIX_BUILD="33"
+        - MATRIX_BUILD="34"
+        - MATRIX_BUILD="35"
 
 build:
     cache: false
